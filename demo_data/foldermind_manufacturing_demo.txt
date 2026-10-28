@@ -1,0 +1,30 @@
+FOLDERMIND SAMPLE DOCUMENT — FICTIONAL MANUFACTURING DATA
+Document ID: FM-QA-017
+Title: Quality and Production Reference Notes
+Revision: C
+Effective date: 2026-10-01
+Owner: Quality Department
+Status: Training example only — NOT an approved shop-floor procedure.
+
+SECTION 1 — FIRST-OFF INSPECTION
+Before a production run of part number AX-204 begins, the operator records the work-order number, machine ID, and first-off inspection result. The first completed part is submitted to Quality for dimensional verification. Production may proceed only after the first-off inspection is marked APPROVED in the work-order record. If inspection is pending, production remains on hold. This paragraph is fictional and is intended to demonstrate document retrieval, not to instruct real operators.
+
+SECTION 2 — DIMENSIONAL REQUIREMENTS
+For this synthetic example, part AX-204 has a nominal shaft diameter of 25.00 mm and an illustrative acceptable range of 24.95 mm to 25.05 mm. A reading of 25.07 mm is outside that range. Measurements are entered alongside the measuring instrument ID and inspection timestamp. These measurements are test data and must not be used for actual manufacturing decisions.
+
+SECTION 3 — NONCONFORMING PARTS
+If a sample part fails the documented dimensional check, the example workflow is to mark the work order as HOLD, label and segregate the affected material, and notify Quality. Quality records a nonconformance report (NCR) and determines next steps. An operator cannot independently change a rejected result to approved. Only an authorized Quality user can close the NCR in this hypothetical workflow.
+
+SECTION 4 — DOCUMENT REVISIONS
+The latest approved revision is the authority for a production instruction. For training purposes, revision C supersedes revision B of FM-QA-017. A document marked DRAFT or OBSOLETE must not be presented as an approved instruction. The FolderMind prototype should cite the revision and title when those fields are present. If the index contains contradictory revisions, the assistant should not guess which is approved; it should report the conflict.
+
+SECTION 5 — ACCESS CONTROL EXAMPLE
+In this fictional company, documents in the Quality directory are accessible to users with the Quality grant. Documents in the Production directory are accessible to users with the Production grant. HR documents are accessible only to HR-authorized users. A user with Production access but no HR access must not retrieve, preview, cite, or receive answers based on HR documents. Directory authorization is checked in the backend before evidence is supplied to the language model.
+
+SECTION 6 — MACHINE DOWNTIME NOTES
+For part AX-204, the demonstration work order records a machine stoppage of 35 minutes due to a tool-change alarm. The downtime entry was filed under work order WO-7312 on 2026-09-18. The record does not state that a motor failed. A question about the cause of a motor failure must be answered as unsupported by this document.
+
+SECTION 7 — SUPERVISOR SUMMARY
+For the fictional process described here: the first-off result gates production, measurements are recorded with traceable instrument details, and nonconforming material is placed on hold pending Quality review. This summary is intentionally redundant so that a retrieval demo can compare how different chunks answer related questions.
+
+END OF SAMPLE DOCUMENT
