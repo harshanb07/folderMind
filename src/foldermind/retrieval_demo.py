@@ -2,6 +2,8 @@ from pathlib import Path
 import chromadb
 
 from chunking import chunk_document
+from generation import generate_answer #getting the llm call and prompt
+
 
 # Read our test file
 path = Path("demo_data/foldermind_manufacturing_demo.txt")
@@ -39,24 +41,45 @@ collection.upsert(
 print(f"Indexed {collection.count()} chunks")
 
 # Search
-question = "What happens if part AX-204 fails inspection?"
+questions = [
+    "What steps should be taken when a part fails dimensional inspection?",
+    "What is the acceptable shaft diameter range for AX-204?",
+    "What caused the machine stoppage on WO-7312?",
+]
 
-#chromadb accepts list of queries, not just one string, hence why we need list
-results = collection.query(
-    query_texts=[question],
-    n_results=10, #topK concept
-) #we tell chromadb to search embeddings in the collections and retrieve records similar to the question
+for question in questions:
+    print(f"\nQUESTION: {question}")
 
-#results is a dictionary, fields like id, documents, metadatas(source)
-for rank, (document, metadata, distance) in enumerate(
-    zip(
-        results["documents"][0],
-        results["metadatas"][0],
-        results["distances"][0],
-    ),
-    start=1,
-):
-    print(f"\n--- RANK {rank} ---")
-    print("Distance:", round(distance, 4))
-    print("Source:", metadata["source"])
-    print("Text:", document[:200])
+    results = collection.query(
+        query_texts=[question],
+        n_results=3,
+    )
+
+    for rank, (document, distance) in enumerate(
+        zip(
+            results["documents"][0],
+            results["distances"][0],
+        ),
+        start=1,
+    ):
+        print(f"\nRank {rank}, Distance {distance:.4f}")
+        print(document[:250])
+
+
+    context = "\n\n".join( #format our context nicely, so that LLM knows which source gave what info
+        f"[Source {i}]\n"
+        f"File: {metadata['source']}\n"
+        f"Content: {document}"
+        for i, (document, metadata) in enumerate(
+            zip(
+                results["documents"][0],
+                results["metadatas"][0],
+            ),
+            start=1,
+        )
+    )
+
+    answer = generate_answer(question, context)
+
+    print("\nFOLDERMIND ANSWER:")
+    print(answer)
