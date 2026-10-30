@@ -3,7 +3,7 @@ import chromadb
 
 from chunking import chunk_document
 from generation import generate_answer #getting the llm call and prompt
-
+from citations import validate_citations, resolve_citations
 
 # Read our test file
 path = Path("demo_data/foldermind_manufacturing_demo.txt")
@@ -42,9 +42,7 @@ print(f"Indexed {collection.count()} chunks")
 
 # Search
 questions = [
-    "What steps should be taken when a part fails dimensional inspection?",
-    "What is the acceptable shaft diameter range for AX-204?",
-    "What caused the machine stoppage on WO-7312?",
+    "What caused the machine stoppage on WO-7312?"
 ]
 
 for question in questions:
@@ -52,8 +50,22 @@ for question in questions:
 
     results = collection.query(
         query_texts=[question],
-        n_results=3,
+        n_results=1,
     )
+
+    retrieved_chunks = []
+
+    for chunk_id, document, metadata in zip(
+        results["ids"][0],
+        results["documents"][0],
+        results["metadatas"][0],
+    ):
+        retrieved_chunks.append({
+            "id": chunk_id,
+            "text": document,
+            "source": metadata["source"],
+            "chunk_index": metadata["chunk_index"],
+        })
 
     for rank, (document, distance) in enumerate(
         zip(
@@ -66,20 +78,33 @@ for question in questions:
         print(document[:250])
 
 
-    context = "\n\n".join( #format our context nicely, so that LLM knows which source gave what info
+    context = "\n\n".join(
         f"[Source {i}]\n"
-        f"File: {metadata['source']}\n"
-        f"Content: {document}"
-        for i, (document, metadata) in enumerate(
-            zip(
-                results["documents"][0],
-                results["metadatas"][0],
-            ),
-            start=1,
-        )
+        f"File: {chunk['source']}\n"
+        f"Content: {chunk['text']}"
+        for i, chunk in enumerate(retrieved_chunks, start=1)
     )
 
     answer = generate_answer(question, context)
 
-    print("\nFOLDERMIND ANSWER:")
-    print(answer)
+    is_valid = validate_citations(
+        answer,
+        len(retrieved_chunks),
+    )
+
+    if is_valid:
+        sources = resolve_citations(answer, retrieved_chunks)
+        print("\nFOLDERMIND ANSWER:")
+        print(answer)
+        print("\nACTUAL CITED SOURCES:")
+
+        for source in sources:
+            print(f"File: {source['source']}")
+            print(f"Chunk ID: {source['id']}")
+            print(f"Chunk Index: {source['chunk_index']}")
+            print("---")
+    else:
+        print("\nCitation validation failed.")
+        print("Candidate answer (not verified):")
+        print(answer)
+
