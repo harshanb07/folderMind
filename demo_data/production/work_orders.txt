@@ -1,0 +1,24 @@
+FICTIONAL MANUFACTURING DATA — PRODUCTION
+
+Work Order: WO-9001
+Part Number: AX-500
+Customer: Northstar Aerospace (fictional)
+Machine: CNC Mill M-04
+Quantity: 120 units
+Due Date: 2026-11-20
+Status: In Progress
+
+Production notes:
+- 75 units have completed the first machining operation.
+- 45 units remain to be machined.
+- The second operation requires a 4-axis fixture.
+- Expected completion: 2026-11-17.
+
+Work Order: WO-9002
+Part Number: BR-210
+Machine: CNC Lathe L-02
+Quantity: 60 units
+Status: On Hold
+Reason: Fixture alignment issue.
+
+Only Production and authorized Quality personnel may access these work-order records.

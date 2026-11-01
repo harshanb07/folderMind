@@ -1,0 +1,24 @@
+FICTIONAL MANUFACTURING DATA — HR
+
+Employee: Jordan Ellis (fictional)
+Employee ID: EMP-9001
+Department: Production
+Position: CNC Operator
+Annual Salary: $72,000 CAD
+Vacation Allowance: 15 days
+
+Employee: Taylor Morgan (fictional)
+Employee ID: EMP-9002
+Department: Quality
+Position: Quality Inspector
+Annual Salary: $78,000 CAD
+Vacation Allowance: 20 days
+
+HR Policy:
+- Vacation requests require supervisor approval.
+- Salary information is restricted to authorized HR personnel.
+- Employee records must never be exposed to unauthorized departments.
+
+Confidential HR Test Code: HR-ORANGE-842.
+
+This document is restricted to authorized HR personnel.
