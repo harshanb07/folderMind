@@ -1,0 +1,22 @@
+FICTIONAL MANUFACTURING DATA — QUALITY
+
+Inspection Report: QC-3001
+Part Number: AX-500
+Work Order: WO-9001
+
+Nominal shaft diameter: 30.00 mm
+Acceptable tolerance: 29.95 mm to 30.05 mm
+Measured diameter: 30.08 mm
+Inspection result: FAILED
+
+Required actions:
+1. Place affected parts on HOLD.
+2. Segregate and label nonconforming material.
+3. Create nonconformance report NCR-3001.
+4. Notify the Quality Manager.
+5. Production may resume only after authorized Quality approval.
+
+Confidential Quality Note:
+The fictional corrective-action authorization code is QC-PURPLE-731.
+
+This document is restricted to authorized Quality personnel.
