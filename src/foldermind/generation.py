@@ -25,7 +25,7 @@ Rules:
 
 def generate_answer(question: str, context: str) -> str:
     response = chat(
-        model="llama3.2:3b",
+        model="llama3.2:latest",
         messages=[
             {
                 "role": "system",
