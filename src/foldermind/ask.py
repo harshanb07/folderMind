@@ -32,15 +32,38 @@ def ask_foldermind(username: str, question: str) -> str:
 
     context = "\n\n".join(context_parts)
 
-    # 3. Give Ollama the question and retrieved context
     answer = generate_answer(question, context)
 
+    print("FIRST ANSWER:", answer)
 
-    # Check whether the LLM used valid source references
-    if answer != "The provided documents do not establish this information.":
+    abstention = "The provided documents do not establish this information."
+
+    # Only factual answers require citations
+    if answer.strip() != abstention:
+
         if not validate_citations(answer, len(documents)):
-            return "Answer generated, but citations are missing or invalid."
 
+            print("Citation missing or invalid. Retrying...")
+
+            retry_question = (
+                f"{question}\n\n"
+                "IMPORTANT: Every factual answer MUST include a citation "
+                "in the exact format [Source 1] or [Source 2]. "
+                "Use only source numbers provided in the evidence. "
+                "Never invent a citation. "
+                "If the evidence does not answer the question, respond exactly: "
+                f"{abstention}"
+            )
+
+            answer = generate_answer(retry_question, context)
+
+            print("RETRY ANSWER:", answer)
+
+            if (
+                answer.strip() != abstention
+                and not validate_citations(answer, len(documents))
+            ):
+                return "Could not generate an answer with valid citations."
     # Match source references back to their actual files
     retrieved_chunks = [
         {
