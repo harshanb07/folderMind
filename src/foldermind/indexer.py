@@ -1,68 +1,77 @@
-
 from pathlib import Path
 import chromadb
 
-from scanner import scan_directory
-from chunking import chunk_document
+from .scanner import scan_directory
+from .chunking import chunk_document
+from .parsers.txt_parser import parse_txt
 
 
 def index_directory(directory: str):
     root = Path(directory)
 
-    # Connect to our local vector database
+    # Connect to ChromaDB
     client = chromadb.PersistentClient(path="./chroma_db")
 
     collection = client.get_or_create_collection(
         name="foldermind_documents"
     )
 
-    # STEP 1: Find all the .txt files
+    # Find all TXT files
     paths = scan_directory(directory)
 
+    # Process each file
     for path in paths:
-        # Skip the original root-level demo document
+
+        # Skip root-level demo files
         if path.parent == root:
             continue
 
-        # STEP 2: Read the file and split it into chunks
-        text = path.read_text(encoding="utf-8")
-        chunks = chunk_document(text)
+        # Parse this file into Document objects
+        parsed_documents = parse_txt(path, root)
 
-        if not chunks:
-            continue
+        # Process every Document returned by the parser
+        for document_index, document in enumerate(parsed_documents):
 
-        # STEP 3: Identify the file and department
-        relative_path = path.relative_to(root).as_posix()
-        department = path.relative_to(root).parts[0]
+            # Split this Document's text into chunks
+            chunks = chunk_document(document.text)
 
-        # STEP 4: Prepare records for ChromaDB
-        ids = []
-        documents = []
-        metadatas = []
+            if not chunks:
+                continue
 
-        for i, chunk in enumerate(chunks):
-            chunk_id = f"{relative_path}:{i}"
+            # Prepare parallel lists for ChromaDB
+            ids = []
+            texts = []
+            metadatas = []
 
-            metadata = {
-                "source": relative_path,
-                "directory": department,
-                "chunk_index": i,
-            }
+            for i, chunk in enumerate(chunks):
 
-            ids.append(chunk_id)
-            documents.append(chunk)
-            metadatas.append(metadata)
+                # Unique ID for this chunk
+                chunk_id = f"{document.source}:{document_index}:{i}"
 
-        # STEP 5: Save chunks into ChromaDB
-        collection.upsert(
-            ids=ids,
-            documents=documents,
-            metadatas=metadatas,
-        )
+                # Preserve parser metadata
+                metadata = {
+                    **document.metadata,
+                    "source": document.source,
+                    "chunk_index": i,
+                }
 
-        print(f"Indexed {len(chunks)} chunks from {relative_path}")
+                ids.append(chunk_id)
+                texts.append(chunk)
+                metadatas.append(metadata)
 
-    print(f"Total chunks in collection: {collection.count()}")
+            # Store this Document's chunks in ChromaDB
+            collection.upsert(
+                ids=ids,
+                documents=texts,
+                metadatas=metadatas,
+            )
+
+            print(
+                f"Indexed {len(chunks)} chunks "
+                f"from {document.source}"
+            )
+
+    print(f"Total chunks: {collection.count()}")
 
 
 if __name__ == "__main__":
