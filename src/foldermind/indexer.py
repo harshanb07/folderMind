@@ -7,7 +7,7 @@ from .parsers.txt_parser import parse_txt
 
 
 def index_directory(directory: str):
-    root = Path(directory)
+    root = Path(directory) #creating path objects to help breakdown
 
     # Connect to ChromaDB
     client = chromadb.PersistentClient(path="./chroma_db")
@@ -16,24 +16,24 @@ def index_directory(directory: str):
         name="foldermind_documents"
     )
 
-    # Find all TXT files
+    # Find all TXT files within the req'd directory
     paths = scan_directory(directory)
 
     # Process each file
-    for path in paths:
+    for path in paths: 
 
         # Skip root-level demo files
-        if path.parent == root:
+        if path.parent == root: #only for the case where in our 'demo_docs' folders hass some standalone file that isn't in a specific directory like production
             continue
 
         # Parse this file into Document objects
-        parsed_documents = parse_txt(path, root)
+        parsed_documents = parse_txt(path, root) #returns a list containing document object
 
-        # Process every Document returned by the parser
+        # Process every Document returned by the parser, technically one 1 document for txt files. more possible for pdfs
         for document_index, document in enumerate(parsed_documents):
 
             # Split this Document's text into chunks
-            chunks = chunk_document(document.text)
+            chunks = chunk_document(document.text) #we can access via '.text' because Document is a dataclass
 
             if not chunks:
                 continue
@@ -43,15 +43,15 @@ def index_directory(directory: str):
             texts = []
             metadatas = []
 
-            for i, chunk in enumerate(chunks):
+            for i, chunk in enumerate(chunks): #iterate over respective chunk and its index (to create unique keys)
 
                 # Unique ID for this chunk
-                chunk_id = f"{document.source}:{document_index}:{i}"
+                chunk_id = f"{document.source}:{document_index}:{i}" #this means every literal chunk has a different index, but also every PAGE in a pdf would also have a different index, so source overlapping not possible
 
                 # Preserve parser metadata
                 metadata = {
-                    **document.metadata,
-                    "source": document.source,
+                    **document.metadata, #dictionary unpacking, so all metadata from document class is copied over to this new dict
+                    "source": document.source, #keps source separate in dataclass because EVERY chunk needs a source
                     "chunk_index": i,
                 }
 
